@@ -23,8 +23,9 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
   const filledItems = invoice.items.filter((item) => item.description.trim());
   const title = invoice.orderTitle.trim();
   const total = invoiceTotal(filledItems);
-  const rowSpacing = 20;
+  const rowSpacing = 18;
   const itemOpacity = 0.78;
+  const lineGap = layout.itemsLineGap;
 
   return (
     <div
@@ -68,61 +69,70 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
         className="absolute"
         style={{
           left: layout.contentLeft,
-          top: layout.itemsTop,
+          top: layout.itemsContentTop,
           width: layout.tableWidth,
         }}
       >
         {title ? (
-          <div style={{ marginBottom: 18 }} className="text-4xl font-thin">
+          <div style={{ marginBottom: rowSpacing }} className="text-4xl font-thin">
             {title}
           </div>
         ) : null}
 
-        {filledItems.map((item) => (
-          <div
-            key={item.id}
-            className="grid items-start leading-tight"
-            style={{
-              ...tableRowStyle,
-              paddingBottom: rowSpacing,
-              opacity: itemOpacity,
-            }}
-          >
-            <span>
-              {title ? <span className="pr-[0.55em]">•</span> : null}
-              {item.description.trim()}
-            </span>
-            <span className="text-center tabular-nums ">{item.qty || ""}</span>
-            <span className="text-left tabular-nums">
-              {formatNaira(Number(item.rate) || 0)}
-            </span>
-            <span className="text-right tabular-nums">
-              {formatNaira(itemAmount(item))}
-            </span>
-          </div>
-        ))}
-
         {filledItems.length > 0 ? (
-          <div
-            className="mt-2"
-            style={{
-              borderTop: `2px solid ${layout.mutedLine}`,
-              paddingTop: 18,
-            }}
-          >
-            <div className="grid font-semibold" style={tableRowStyle}>
-              <span>Total</span>
-              <span />
-              <span />
-              <span className="text-right tabular-nums">{formatNaira(total)}</span>
+          <>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: rowSpacing,
+                paddingBottom: lineGap,
+                borderBottom: `2px solid ${layout.mutedLine}`,
+              }}
+            >
+              {filledItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="grid items-start leading-tight"
+                  style={{
+                    ...tableRowStyle,
+                    opacity: itemOpacity,
+                  }}
+                >
+                  <span>
+                    {title ? <span className="pr-[0.55em]">•</span> : null}
+                    {item.description.trim()}
+                  </span>
+                  <span className="text-center tabular-nums">{item.qty || ""}</span>
+                  <span className="text-left tabular-nums">
+                    {formatNaira(Number(item.rate) || 0)}
+                  </span>
+                  <span className="text-right tabular-nums">
+                    {formatNaira(itemAmount(item))}
+                  </span>
+                </div>
+              ))}
             </div>
-          </div>
+
+            <div style={{ paddingTop: lineGap }}>
+              <div className="grid font-semibold" style={tableRowStyle}>
+                <span className="text-4xl">Total</span>
+                <span />
+                <span />
+                <span className="text-right tabular-nums text-4xl">{formatNaira(total)}</span>
+              </div>
+            </div>
+          </>
         ) : null}
       </div>
 
       <div
-        className="absolute"
-        style={{ left: layout.clientLeft, top: layout.deliveryTop, width: 280 }}
+        className="absolute text-4xl font-thin"
+        style={{
+          left: layout.deliveryLeft,
+          top: layout.deliveryValueTop,
+          width: 260,
+        }}
       >
         {invoice.delivery.trim()}
       </div>

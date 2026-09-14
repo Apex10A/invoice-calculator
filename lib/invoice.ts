@@ -38,8 +38,11 @@ type OverlayLayout = {
   tableWidth: number;
   dateTop: number;
   clientLeft: number;
-  itemsTop: number;
-  deliveryTop: number;
+  /** Y where item text begins — equal gap below template top rule and above bottom rule. */
+  itemsContentTop: number;
+  itemsLineGap: number;
+  deliveryLeft: number;
+  deliveryValueTop: number;
   text: string;
   mutedLine: string;
 };
@@ -50,8 +53,10 @@ export const OVERLAY: Record<InvoiceTheme, OverlayLayout> = {
     tableWidth: 1144,
     dateTop: 848,
     clientLeft: 1304,
-    itemsTop: 1228,
-    deliveryTop: 2384,
+    itemsContentTop: 1176,
+    itemsLineGap: 28,
+    deliveryLeft: 1352,
+    deliveryValueTop: 2368,
     text: "#1a1816",
     mutedLine: "rgb(118, 113, 107)",
   },
@@ -60,8 +65,10 @@ export const OVERLAY: Record<InvoiceTheme, OverlayLayout> = {
     tableWidth: 1144,
     dateTop: 908,
     clientLeft: 1304,
-    itemsTop: 1290,
-    deliveryTop: 2576,
+    itemsContentTop: 1238,
+    itemsLineGap: 28,
+    deliveryLeft: 1352,
+    deliveryValueTop: 2604,
     text: "#f6f6f6",
     mutedLine: "rgb(180, 180, 180)",
   },
