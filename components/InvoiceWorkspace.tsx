@@ -310,50 +310,40 @@ export function InvoiceWorkspace() {
           ))}
         </div>
 
-        <div className="mt-8 hidden grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid">
-          <button
-            type="button"
-            disabled={busy !== null}
-            onClick={() => handleDownload("jpeg")}
-            className="rounded-full bg-[#171412] px-5 py-3.5 text-[11px] tracking-[0.18em] text-[#f6eee4] uppercase disabled:opacity-60"
-          >
-            {busy === "jpeg" ? "Saving…" : "Download JPEG"}
-          </button>
-          <button
-            type="button"
-            disabled={busy !== null}
-            onClick={() => handleDownload("pdf")}
-            className="rounded-full border border-[#171412]/25 bg-white/40 px-5 py-3.5 text-[11px] tracking-[0.18em] text-[#171412] uppercase disabled:opacity-60"
-          >
-            {busy === "pdf" ? "Saving…" : "Download PDF"}
-          </button>
-        </div>
     </>
   );
 
-  const downloadButtons = (
+  const downloadButtons = (variant: "mobile" | "desktop") => (
     <div className="grid grid-cols-2 gap-2.5">
       <button
         type="button"
         disabled={busy !== null}
         onClick={() => handleDownload("jpeg")}
-        className="rounded-full bg-[#171412] px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+        className={
+          variant === "desktop"
+            ? "rounded-full bg-[#f8f3eb] px-5 py-3 text-[11px] tracking-[0.16em] text-[#171412] uppercase disabled:opacity-60"
+            : "rounded-full bg-[#171412] px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+        }
       >
-        {busy === "jpeg" ? "Saving…" : "JPEG"}
+        {busy === "jpeg" ? "Saving…" : "Download JPEG"}
       </button>
       <button
         type="button"
         disabled={busy !== null}
         onClick={() => handleDownload("pdf")}
-        className="rounded-full border border-white/15 bg-white/5 px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+        className={
+          variant === "desktop"
+            ? "rounded-full border border-white/20 bg-transparent px-5 py-3 text-[11px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+            : "rounded-full border border-white/15 bg-white/5 px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+        }
       >
-        {busy === "pdf" ? "Saving…" : "PDF"}
+        {busy === "pdf" ? "Saving…" : "Download PDF"}
       </button>
     </div>
   );
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:grid lg:grid-cols-[minmax(0,390px)_1fr] lg:items-start lg:gap-14 lg:px-10 lg:pb-20">
+    <div className="desktop-studio relative mx-auto w-full max-w-7xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start lg:gap-12 lg:px-12 lg:pb-24 xl:gap-20">
       <div
         className="sticky top-0 z-30 -mx-4 mb-5 border-b border-white/[0.06] bg-[#0a0908]/90 px-4 py-3 backdrop-blur-md lg:hidden"
         role="tablist"
@@ -390,33 +380,38 @@ export function InvoiceWorkspace() {
       </div>
 
       <div
-        className={`lg:pb-8 ${mobilePanel === "details" ? "block" : "hidden lg:block"}`}
+        className={`lg:col-start-1 lg:row-start-1 lg:pb-4 ${mobilePanel === "details" ? "block" : "hidden lg:block"}`}
       >
         <ResponsiveFormFrame>{form}</ResponsiveFormFrame>
       </div>
 
       <aside
-        className={`lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:pb-6 ${
+        className={`lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8 lg:self-start lg:border-l lg:border-white/[0.07] lg:pl-12 lg:max-h-[calc(100vh-2.5rem)] ${
           mobilePanel === "invoice" ? "block" : "hidden lg:block"
         }`}
       >
-        <div className="preview-stage mb-5 flex items-end justify-between gap-4 rounded-2xl px-5 py-4">
+        <div className="preview-stage mb-6 flex flex-wrap items-end justify-between gap-4 rounded-2xl px-5 py-5 lg:px-6">
           <div>
             <p className="text-[10px] tracking-[0.45em] text-[#a88657] uppercase">
               Live preview
             </p>
-            <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[#faf6f0]">
-              Your template
-            </h2>
+            {/* <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[#faf6f0] xl:text-3xl">
+              GEM template
+            </h2> */}
           </div>
-          <p className="text-[10px] tracking-[0.2em] text-[#8a7d6e] uppercase">
-            {invoice.theme} mode
-          </p>
+          <div className="text-right">
+            <p className="text-[10px] tracking-[0.2em] text-[#8a7d6e] uppercase">
+              {invoice.theme} mode
+            </p>
+            {/* <p className="mt-1 text-sm tabular-nums text-[#d4c4b0]">
+              {`N${total.toLocaleString("en-NG")}`}
+            </p> */}
+          </div>
         </div>
-        <div className="flex justify-center lg:justify-start">
+        <div className="flex justify-center lg:justify-start xl:justify-center">
           <div
             ref={frameRef}
-            className="relative w-full max-w-[min(100%,520px)] overflow-hidden rounded-xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/10"
+            className="relative w-full max-w-[min(100%,520px)] overflow-hidden rounded-xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/10 xl:max-w-[580px]"
             style={{
               aspectRatio: `${TEMPLATE.width} / ${TEMPLATE.height}`,
             }}
@@ -435,10 +430,10 @@ export function InvoiceWorkspace() {
             </div>
           </div>
         </div>
-        <div className="mt-6 lg:hidden">{downloadButtons}</div>
-        <p className="mt-4 hidden text-[11px] leading-relaxed text-[#6f655c] lg:block">
-          Stays in view while you scroll the form.
-        </p>
+        <div className="mt-8 hidden max-w-[580px] lg:block xl:mx-auto">
+          {downloadButtons("desktop")}
+        </div>
+        <div className="mt-6 lg:hidden">{downloadButtons("mobile")}</div>
       </aside>
 
       <div

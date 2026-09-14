@@ -79,6 +79,12 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+@media (min-width: 1024px) {
+  .desktop-studio {
+    min-height: calc(100vh - 12rem);
+  }
+}
+
 .invoice-sheet {
   font-family: "Campton Book", Campton, var(--font-invoice), sans-serif;
 }
