@@ -23,9 +23,8 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
   const filledItems = invoice.items.filter((item) => item.description.trim());
   const title = invoice.orderTitle.trim();
   const total = invoiceTotal(filledItems);
-  const maxBlock = layout.deliveryTop - layout.itemsTop - 80;
-  const rowCount = filledItems.length + (title ? 1 : 0) + 1;
-  const rowHeight = Math.min(128, Math.max(96, maxBlock / Math.max(rowCount, 1)));
+  const rowSpacing = 20;
+  const itemOpacity = 0.78;
 
   return (
     <div
@@ -74,24 +73,26 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
         }}
       >
         {title ? (
-          <div style={{ marginBottom: rowHeight * 0.25 }} className="text-4xl font-thin">{title}</div>
+          <div style={{ marginBottom: 18 }} className="text-4xl font-thin">
+            {title}
+          </div>
         ) : null}
 
         {filledItems.map((item) => (
           <div
             key={item.id}
-            className="grid items-start"
+            className="grid items-start leading-tight"
             style={{
               ...tableRowStyle,
-              minHeight: rowHeight,
-              paddingBottom: 18,
+              paddingBottom: rowSpacing,
+              opacity: itemOpacity,
             }}
           >
             <span>
               {title ? <span className="pr-[0.55em]">•</span> : null}
               {item.description.trim()}
             </span>
-            <span className="text-center tabular-nums">{item.qty || ""}</span>
+            <span className="text-center tabular-nums ">{item.qty || ""}</span>
             <span className="text-left tabular-nums">
               {formatNaira(Number(item.rate) || 0)}
             </span>
@@ -106,7 +107,7 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
             className="mt-2"
             style={{
               borderTop: `2px solid ${layout.mutedLine}`,
-              paddingTop: 28,
+              paddingTop: 18,
             }}
           >
             <div className="grid font-semibold" style={tableRowStyle}>

@@ -97,6 +97,18 @@ export function formatNaira(value: number): string {
   return `N${amount.toLocaleString("en-NG")}`;
 }
 
+export function parseFormattedInteger(raw: string): number {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return 0;
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function formatIntegerInput(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return "";
+  return Math.round(value).toLocaleString("en-NG");
+}
+
 export function itemAmount(item: InvoiceItem): number {
   const qty = Number(item.qty) || 0;
   const rate = Number(item.rate) || 0;
