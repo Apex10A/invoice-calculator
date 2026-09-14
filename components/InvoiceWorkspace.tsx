@@ -4,8 +4,10 @@ import { InvoiceDocument } from "@/components/InvoiceDocument";
 import {
   TEMPLATE,
   createItem,
+  formatIntegerInput,
   invoiceFileSlug,
   invoiceTotal,
+  parseFormattedInteger,
   resizeItems,
   todayInputValue,
   type Invoice,
@@ -80,6 +82,9 @@ export function InvoiceWorkspace() {
       items: current.items.map((item) => {
         if (item.id !== id) return item;
         if (field === "description") return { ...item, description: value };
+        if (field === "rate") {
+          return { ...item, rate: parseFormattedInteger(value) };
+        }
         const numeric = value === "" ? 0 : Number(value);
         return { ...item, [field]: Number.isFinite(numeric) ? numeric : 0 };
       }),
@@ -254,7 +259,7 @@ export function InvoiceWorkspace() {
           </p>
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-3">
           {invoice.items.map((item, index) => (
             <div
               key={item.id}
@@ -291,13 +296,14 @@ export function InvoiceWorkspace() {
                     Rate (₦)
                   </span>
                   <input
-                    type="number"
-                    min={0}
-                    value={item.rate || ""}
+                    type="text"
+                    inputMode="numeric"
+                    value={formatIntegerInput(item.rate)}
                     onChange={(event) =>
                       updateItem(item.id, "rate", event.target.value)
                     }
-                    className="mt-1 w-full border-0 border-b border-[#d7c4ae] bg-transparent pb-1 outline-none"
+                    placeholder="10,000"
+                    className="mt-1 w-full border-0 border-b border-[#d7c4ae] bg-transparent pb-1 outline-none tabular-nums"
                   />
                 </label>
               </div>
