@@ -1,6 +1,7 @@
 "use client";
 
 import { InvoiceDocument } from "@/components/InvoiceDocument";
+import { ResponsiveFormFrame } from "@/components/ResponsiveFormFrame";
 import {
   TEMPLATE,
   createItem,
@@ -38,6 +39,9 @@ export function InvoiceWorkspace() {
   }));
   const [itemCountText, setItemCountText] = useState("1");
   const itemCountFocused = useRef(false);
+  const [mobilePanel, setMobilePanel] = useState<"details" | "invoice">(
+    "details",
+  );
 
   const total = useMemo(() => invoiceTotal(invoice.items), [invoice.items]);
 
@@ -144,21 +148,16 @@ export function InvoiceWorkspace() {
     }
   }
 
-  return (
-    <div className="mx-auto grid min-h-full w-full max-w-[1440px] gap-8 px-5 py-8 lg:grid-cols-[minmax(320px,440px)_minmax(0,1fr)] lg:items-start lg:px-10 lg:py-10">
-      <section className="rounded-[28px] border border-[rgba(201,162,109,0.28)] bg-[#f6eee4] p-6 text-[#1c1917] shadow-[0_30px_80px_rgba(0,0,0,0.28)] sm:p-8">
-        <p className="font-[family-name:var(--font-display)] text-[11px] tracking-[0.38em] text-[#9a7043] uppercase">
-          New invoice
-        </p>
-        <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl leading-none text-[#171412]">
+  const form = (
+    <>
+        <h2 className="font-[family-name:var(--font-display)] text-2xl leading-tight text-[#171412]">
           Client details
-        </h1>
-        <p className="mt-3 max-w-sm text-sm leading-6 text-[#5c534b]">
-          Add the client and the number of pieces. The GEM invoice fills itself
-          — no new design for each order.
+        </h2>
+        <p className="mt-2 text-[13px] leading-5 text-[#6b6258]">
+          Add the client and pieces, the invoice fills itself.
         </p>
 
-        <div className="mt-7 grid grid-cols-2 gap-2 rounded-full bg-[#eadccb] p-1">
+        <div className="mt-6 grid grid-cols-2 gap-2 rounded-full bg-[#ebe0d0] p-1">
           {(["light", "dark"] as InvoiceTheme[]).map((theme) => (
             <button
               key={theme}
@@ -175,7 +174,7 @@ export function InvoiceWorkspace() {
           ))}
         </div>
 
-        <label className="mt-7 block">
+        <label className="mt-6 block">
           <span className="text-[11px] tracking-[0.22em] text-[#9a7043] uppercase">
             Client
           </span>
@@ -311,12 +310,12 @@ export function InvoiceWorkspace() {
           ))}
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        <div className="mt-8 hidden grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid">
           <button
             type="button"
             disabled={busy !== null}
             onClick={() => handleDownload("jpeg")}
-            className="rounded-full bg-[#171412] px-5 py-3 text-sm tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+            className="rounded-full bg-[#171412] px-5 py-3.5 text-[11px] tracking-[0.18em] text-[#f6eee4] uppercase disabled:opacity-60"
           >
             {busy === "jpeg" ? "Saving…" : "Download JPEG"}
           </button>
@@ -324,44 +323,148 @@ export function InvoiceWorkspace() {
             type="button"
             disabled={busy !== null}
             onClick={() => handleDownload("pdf")}
-            className="rounded-full border border-[#171412] px-5 py-3 text-sm tracking-[0.16em] text-[#171412] uppercase disabled:opacity-60"
+            className="rounded-full border border-[#171412]/25 bg-white/40 px-5 py-3.5 text-[11px] tracking-[0.18em] text-[#171412] uppercase disabled:opacity-60"
           >
             {busy === "pdf" ? "Saving…" : "Download PDF"}
           </button>
         </div>
-      </section>
+    </>
+  );
 
-      <section className="lg:sticky lg:top-8">
-        <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[#f3ebe1]">
-            Preview
-          </h2>
-          <p className="text-xs tracking-[0.22em] text-[#c9a26d] uppercase">
-            {invoice.theme} template
+  const downloadButtons = (
+    <div className="grid grid-cols-2 gap-2.5">
+      <button
+        type="button"
+        disabled={busy !== null}
+        onClick={() => handleDownload("jpeg")}
+        className="rounded-full bg-[#171412] px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+      >
+        {busy === "jpeg" ? "Saving…" : "JPEG"}
+      </button>
+      <button
+        type="button"
+        disabled={busy !== null}
+        onClick={() => handleDownload("pdf")}
+        className="rounded-full border border-white/15 bg-white/5 px-4 py-3.5 text-[10px] tracking-[0.16em] text-[#f6eee4] uppercase disabled:opacity-60"
+      >
+        {busy === "pdf" ? "Saving…" : "PDF"}
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="relative mx-auto w-full max-w-6xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:grid lg:grid-cols-[minmax(0,390px)_1fr] lg:items-start lg:gap-14 lg:px-10 lg:pb-20">
+      <div
+        className="sticky top-0 z-30 -mx-4 mb-5 border-b border-white/[0.06] bg-[#0a0908]/90 px-4 py-3 backdrop-blur-md lg:hidden"
+        role="tablist"
+        aria-label="Invoice panels"
+      >
+        <div className="grid grid-cols-2 gap-2 rounded-full bg-white/[0.06] p-1">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobilePanel === "details"}
+            onClick={() => setMobilePanel("details")}
+            className={`rounded-full py-2.5 text-[11px] tracking-[0.14em] uppercase transition ${
+              mobilePanel === "details"
+                ? "bg-[#f8f3eb] text-[#171412]"
+                : "text-[#a89a8c]"
+            }`}
+          >
+            Details
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobilePanel === "invoice"}
+            onClick={() => setMobilePanel("invoice")}
+            className={`rounded-full py-2.5 text-[11px] tracking-[0.14em] uppercase transition ${
+              mobilePanel === "invoice"
+                ? "bg-[#f8f3eb] text-[#171412]"
+                : "text-[#a89a8c]"
+            }`}
+          >
+            Invoice
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={`lg:pb-8 ${mobilePanel === "details" ? "block" : "hidden lg:block"}`}
+      >
+        <ResponsiveFormFrame>{form}</ResponsiveFormFrame>
+      </div>
+
+      <aside
+        className={`lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:pb-6 ${
+          mobilePanel === "invoice" ? "block" : "hidden lg:block"
+        }`}
+      >
+        <div className="preview-stage mb-5 flex items-end justify-between gap-4 rounded-2xl px-5 py-4">
+          <div>
+            <p className="text-[10px] tracking-[0.45em] text-[#a88657] uppercase">
+              Live preview
+            </p>
+            <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[#faf6f0]">
+              Your template
+            </h2>
+          </div>
+          <p className="text-[10px] tracking-[0.2em] text-[#8a7d6e] uppercase">
+            {invoice.theme} mode
           </p>
         </div>
-        <div
-          ref={frameRef}
-          className="relative max-w-[560px] overflow-hidden rounded-[24px] shadow-[0_40px_100px_rgba(0,0,0,0.45)]"
-          style={{
-            width: "100%",
-            aspectRatio: `${TEMPLATE.width} / ${TEMPLATE.height}`,
-          }}
-        >
+        <div className="flex justify-center lg:justify-start">
           <div
+            ref={frameRef}
+            className="relative w-full max-w-[min(100%,520px)] overflow-hidden rounded-xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/10"
             style={{
-              width: TEMPLATE.width,
-              height: TEMPLATE.height,
-              transform: `scale(${previewScale})`,
-              transformOrigin: "top left",
+              aspectRatio: `${TEMPLATE.width} / ${TEMPLATE.height}`,
             }}
           >
-            <div ref={invoiceRef}>
-              <InvoiceDocument invoice={invoice} />
+            <div
+              style={{
+                width: TEMPLATE.width,
+                height: TEMPLATE.height,
+                transform: `scale(${previewScale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              <div ref={invoiceRef}>
+                <InvoiceDocument invoice={invoice} />
+              </div>
             </div>
           </div>
         </div>
-      </section>
+        <div className="mt-6 lg:hidden">{downloadButtons}</div>
+        <p className="mt-4 hidden text-[11px] leading-relaxed text-[#6f655c] lg:block">
+          Stays in view while you scroll the form.
+        </p>
+      </aside>
+
+      <div
+        className={`mobile-dock fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#0c0b0a]/95 px-4 py-3 backdrop-blur-lg lg:hidden ${
+          mobilePanel === "details" ? "block" : "hidden"
+        }`}
+        style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="mx-auto flex max-w-lg items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[9px] tracking-[0.28em] text-[#8a7d6e] uppercase">
+              Total
+            </p>
+            <p className="truncate text-lg tabular-nums text-[#f6eee4]">
+              {`N${total.toLocaleString("en-NG")}`}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobilePanel("invoice")}
+            className="shrink-0 rounded-full bg-[#c9a26d] px-5 py-3 text-[11px] tracking-[0.12em] text-[#171412] uppercase"
+          >
+            See invoice
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
