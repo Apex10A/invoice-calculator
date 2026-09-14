@@ -34,8 +34,25 @@ export function InvoiceWorkspace() {
     orderTitle: "",
     items: [createItem()],
   }));
+  const [itemCountText, setItemCountText] = useState("1");
+  const itemCountFocused = useRef(false);
 
   const total = useMemo(() => invoiceTotal(invoice.items), [invoice.items]);
+
+  useEffect(() => {
+    if (!itemCountFocused.current) {
+      setItemCountText(String(invoice.items.length));
+    }
+  }, [invoice.items.length]);
+
+  function commitItemCount(raw: string) {
+    const n = Math.max(1, Math.min(12, Math.floor(Number(raw)) || 1));
+    setItemCountText(String(n));
+    setInvoice((current) => ({
+      ...current,
+      items: resizeItems(current.items, n),
+    }));
+  }
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -208,15 +225,27 @@ export function InvoiceWorkspace() {
               Number of items
             </span>
             <input
-              type="number"
-              min={1}
-              max={12}
-              value={invoice.items.length}
-              onChange={(event) =>
-                patch({
-                  items: resizeItems(invoice.items, Number(event.target.value)),
-                })
-              }
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={itemCountText}
+              onFocus={() => {
+                itemCountFocused.current = true;
+              }}
+              onBlur={() => {
+                itemCountFocused.current = false;
+                commitItemCount(itemCountText);
+              }}
+              onChange={(event) => {
+                const next = event.target.value;
+                if (!/^\d*$/.test(next)) return;
+                setItemCountText(next);
+                if (next === "") return;
+                const n = Number(next);
+                if (n >= 1 && n <= 12) {
+                  patch({ items: resizeItems(invoice.items, n) });
+                }
+              }}
               className="mt-2 w-full border-0 border-b border-[#c9a26d] bg-transparent pb-2 text-2xl outline-none"
             />
           </label>
